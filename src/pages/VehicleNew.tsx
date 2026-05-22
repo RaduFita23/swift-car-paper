@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { ocrDocument, fileToBase64 } from "@/lib/ocr/client";
+import { ocrDocument } from "@/lib/ocr/client";
 import { useDropzone } from "react-dropzone";
 import { Loader2, Upload, Save } from "lucide-react";
 

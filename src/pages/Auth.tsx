@@ -99,24 +99,17 @@ function SignupForm() {
       const redirectUrl = `${window.location.origin}/dashboard`;
       const { data, error } = await supabase.auth.signUp({
         email, password,
-        options: { emailRedirectTo: redirectUrl, data: { person_type: personType } },
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: { person_type: personType, ocr: extracted ?? undefined },
+        },
       });
       if (error) { setLoading(false); toast.error(error.message); return; }
-      // populează profilul cu datele OCR
-      if (data.user && extracted) {
-        const profileUpdate: any = {
-          person_type: personType,
-          nume: extracted.nume, prenume: extracted.prenume, cnp: extracted.cnp,
-          serie_buletin: extracted.serie, numar_buletin: extracted.numar,
-          adresa: extracted.adresa, data_nasterii: extracted.data_nasterii,
-        };
-        await supabase.from("profiles").update(profileUpdate).eq("id", data.user.id);
-        // încarcă fișierul buletinului în storage
-        if (ocrFile) {
-          const path = `${data.user.id}/buletin-${Date.now()}-${ocrFile.name}`;
-          await supabase.storage.from("documents").upload(path, ocrFile);
-          await supabase.from("documents").insert({ user_id: data.user.id, type: "buletin", storage_path: path, ocr_data: extracted });
-        }
+      // încarcă fișierul buletinului în storage (dacă există sesiune activă)
+      if (data.user && data.session && ocrFile && extracted) {
+        const path = `${data.user.id}/buletin-${Date.now()}-${ocrFile.name}`;
+        await supabase.storage.from("documents").upload(path, ocrFile);
+        await supabase.from("documents").insert({ user_id: data.user.id, type: "buletin", storage_path: path, ocr_data: extracted });
       }
       setLoading(false);
       toast.success("Cont creat!");

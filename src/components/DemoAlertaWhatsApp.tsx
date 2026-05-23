@@ -6,7 +6,7 @@ import { MessageCircle, Loader2 } from "lucide-react";
 
 // Modulară: schimbă URL-ul webhook-ului n8n aici (sau prin prop `webhookUrl`).
 // Pentru a o elimina, șterge importul și utilizarea componentei + acest fișier.
-const DEFAULT_WEBHOOK_URL = "AICI_PUI_URL_UL_TEST_WEBHOOK_DIN_N8N";
+const DEFAULT_WEBHOOK_URL = "https://mihai70.app.n8n.cloud/webhook-test/trimite-alerta";
 
 export interface WebhookPayload {
   phone_number: string;
@@ -63,11 +63,7 @@ export default function DemoAlertaWhatsApp({
       <p className="text-sm text-muted-foreground mb-4">
         Testează trimiterea automată a notificării cu o săptămână înainte de expirare.
       </p>
-      <Button
-        onClick={trimiteNotificareWhatsApp}
-        disabled={loading}
-        className="w-full"
-      >
+      <Button onClick={trimiteNotificareWhatsApp} disabled={loading} className="w-full">
         {loading ? (
           <>
             <Loader2 className="size-4 mr-2 animate-spin" /> Se trimite...

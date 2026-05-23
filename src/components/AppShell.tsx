@@ -58,9 +58,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+export function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
+  const { user, isAdmin, loading } = useAuth();
+  const loc = useLocation();
   if (loading) return <div className="min-h-screen grid place-items-center text-muted-foreground">Se încarcă…</div>;
   if (!user) { window.location.href = "/auth"; return null; }
+  if (adminOnly && !isAdmin) return <Navigate to="/dashboard" replace />;
+  if (isAdmin && !loc.pathname.startsWith("/admin")) return <Navigate to="/admin" replace />;
   return <AppShell>{children}</AppShell>;
 }

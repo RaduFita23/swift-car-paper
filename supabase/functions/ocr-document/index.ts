@@ -4,7 +4,7 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-type DocType = "buletin" | "civ" | "talon" | "rca" | "cerere_inmatriculare" | "plata_certificat" | "contract_vc";
+type DocType = "buletin" | "civ" | "talon" | "rca" | "cerere_inmatriculare" | "plata_certificat" | "contract_vc" | "itp";
 
 const SCHEMAS: Record<DocType, { name: string; description: string; parameters: any }> = {
   buletin: {

@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Car, FileText, LayoutDashboard, LogOut, Shield } from "lucide-react";
@@ -9,12 +9,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const loc = useLocation();
   const nav = useNavigate();
 
-  const items = [
-    { to: "/dashboard", label: "Panou", icon: LayoutDashboard },
-    { to: "/vehicles", label: "Mașini", icon: Car },
-    { to: "/transactions", label: "Tranzacții", icon: FileText },
-    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
-  ];
+  const items = isAdmin
+    ? [{ to: "/admin", label: "Admin", icon: Shield }]
+    : [
+        { to: "/dashboard", label: "Panou", icon: LayoutDashboard },
+        { to: "/vehicles", label: "Mașini", icon: Car },
+        { to: "/transactions", label: "Tranzacții", icon: FileText },
+      ];
 
   return (
     <div className="min-h-screen flex bg-background">

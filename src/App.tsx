@@ -15,6 +15,7 @@ import VehicleDetail from "./pages/VehicleDetail";
 import Transactions from "./pages/Transactions";
 import TransactionNew from "./pages/TransactionNew";
 import TransactionDetail from "./pages/TransactionDetail";
+import SharedTransaction from "./pages/SharedTransaction";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -38,6 +39,8 @@ const App = () => (
             <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
             <Route path="/transactions/new" element={<ProtectedRoute><TransactionNew /></ProtectedRoute>} />
             <Route path="/transactions/:id" element={<ProtectedRoute><TransactionDetail /></ProtectedRoute>} />
+            {/* Sesiune partajată — accesibilă fără login (guest-ul vede CTA spre /auth) */}
+            <Route path="/t/:token" element={<SharedTransaction />} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

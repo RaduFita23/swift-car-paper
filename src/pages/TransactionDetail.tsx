@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Loader2, FileDown, FileText } from "lucide-react";
 import { DocumentUploader } from "@/components/DocumentUploader";
+import { ShareTransactionDialog } from "@/components/ShareTransactionDialog";
 import { getStrategyByKind } from "@/modules/transactions/strategies/registry";
 import { profileToParty } from "@/modules/transactions/strategies/types";
 import type { Tables } from "@/integrations/supabase/types";
@@ -63,6 +64,7 @@ export default function TransactionDetail() {
       marca: vehicle.marca, model: vehicle.model, an: vehicle.an, vin: vehicle.vin,
       nr_inmatriculare: vehicle.nr_inmatriculare, serie_civ: vehicle.serie_civ,
       capacitate_cilindrica: vehicle.capacitate_cilindrica, culoare: vehicle.culoare,
+      itp_expira_la: vehicle.itp_expira_la,
     },
     price: Number(tx.price), currency: tx.currency, date: new Date().toLocaleDateString("ro-RO"),
     uploadedDocs: [...uploadedTypes] as any,
@@ -89,12 +91,20 @@ export default function TransactionDetail() {
 
   return (
     <div className="p-8 max-w-5xl space-y-6">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">{vehicle.marca} {vehicle.model}</h1>
           <p className="text-muted-foreground mt-1">{strategy.label}</p>
         </div>
-        <Badge variant={tx.status === "signed" ? "default" : "secondary"}>{tx.status}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant={tx.status === "signed" || tx.status === "completed" ? "default" : "secondary"}>{tx.status}</Badge>
+          {tx.share_token && (
+            <ShareTransactionDialog
+              shareToken={tx.share_token}
+              carLabel={`${vehicle.marca} ${vehicle.model}`}
+            />
+          )}
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">

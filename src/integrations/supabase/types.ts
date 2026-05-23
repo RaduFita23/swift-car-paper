@@ -165,6 +165,9 @@ export type Database = {
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at: string
           vehicle_id: string
+          share_token: string
+          seller_approved_at: string | null
+          buyer_approved_at: string | null
         }
         Insert: {
           buyer_id?: string | null
@@ -179,6 +182,9 @@ export type Database = {
           type: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           vehicle_id: string
+          share_token?: string
+          seller_approved_at?: string | null
+          buyer_approved_at?: string | null
         }
         Update: {
           buyer_id?: string | null
@@ -193,6 +199,9 @@ export type Database = {
           type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
           vehicle_id?: string
+          share_token?: string
+          seller_approved_at?: string | null
+          buyer_approved_at?: string | null
         }
         Relationships: [
           {
@@ -285,6 +294,36 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_shared_transaction: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          status: Database["public"]["Enums"]["transaction_status"]
+          type: Database["public"]["Enums"]["transaction_type"]
+          price: number | null
+          currency: string | null
+          seller_id: string
+          buyer_id: string | null
+          seller_approved_at: string | null
+          buyer_approved_at: string | null
+          vehicle: Json
+          seller: Json
+          buyer: Json
+          has_contract: boolean
+        }[]
+      }
+      join_transaction_as_buyer: {
+        Args: { p_token: string }
+        Returns: string
+      }
+      approve_transaction: {
+        Args: { p_token: string }
+        Returns: Database["public"]["Tables"]["transactions"]["Row"]
+      }
+      unapprove_transaction: {
+        Args: { p_token: string }
+        Returns: Database["public"]["Tables"]["transactions"]["Row"]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
@@ -298,7 +337,14 @@ export type Database = {
         | "talon"
         | "itp"
       person_type: "fizica" | "juridica"
-      transaction_status: "draft" | "docs_pending" | "ready" | "signed"
+      transaction_status:
+        | "draft"
+        | "docs_pending"
+        | "awaiting_buyer"
+        | "awaiting_approvals"
+        | "ready"
+        | "signed"
+        | "completed"
       transaction_type: "pf_pf" | "pf_pj" | "pj_pf" | "pj_pj"
     }
     CompositeTypes: {
@@ -439,7 +485,15 @@ export const Constants = {
         "itp",
       ],
       person_type: ["fizica", "juridica"],
-      transaction_status: ["draft", "docs_pending", "ready", "signed"],
+      transaction_status: [
+        "draft",
+        "docs_pending",
+        "awaiting_buyer",
+        "awaiting_approvals",
+        "ready",
+        "signed",
+        "completed",
+      ],
       transaction_type: ["pf_pf", "pf_pj", "pj_pf", "pj_pj"],
     },
   },

@@ -4,8 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, FileDown } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { DocumentUploader } from "@/components/DocumentUploader";
+import { mapVehicleOcr } from "@/lib/ocr/vehicle";
+import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
 export default function VehicleDetail() {
@@ -55,7 +57,7 @@ export default function VehicleDetail() {
 
       <Card className="p-5">
         <h3 className="font-semibold mb-1">Documente mașină</h3>
-        <p className="text-sm text-muted-foreground mb-4">Salvăm actele pentru reutilizare în tranzacții.</p>
+        <p className="text-sm text-muted-foreground mb-4">Salvăm actele și completăm automat datele tehnice de pe ele.</p>
         <div className="grid sm:grid-cols-3 gap-3">
           {docTypes.map(({ type, label, ocr }) => {
             const existing = docs.find((d) => d.type === type);
@@ -64,7 +66,33 @@ export default function VehicleDetail() {
                 key={type} userId={user!.id} type={type} label={label}
                 vehicleId={v.id} runOcr={ocr}
                 existing={existing ? { id: existing.id, storage_path: existing.storage_path } : undefined}
-                onUploaded={load}
+                onUploaded={async (ocrData) => {
+                  // Auto-fill datele tehnice din CIV / talon înapoi în vehicul.
+                  if ((type === "civ" || type === "talon") && ocrData) {
+                    const mapped = mapVehicleOcr(ocrData);
+                    const patch: Record<string, any> = {};
+                    for (const [k, val] of Object.entries(mapped)) {
+                      if (val === undefined || val === null || val === "") continue;
+                      const current = (v as any)[k];
+                      // Pentru ITP, dacă data citită e mai recentă decât cea existentă,
+                      // o folosim (utilizatorul a încărcat probabil un talon mai nou).
+                      if (k === "itp_expira_la" && current && typeof val === "string") {
+                        if (new Date(val).getTime() > new Date(current).getTime()) patch[k] = val;
+                      } else if (current === null || current === undefined || current === "") {
+                        patch[k] = val;
+                      }
+                    }
+                    if (Object.keys(patch).length > 0) {
+                      const { error } = await supabase
+                        .from("vehicles")
+                        .update(patch as Tables<"vehicles">)
+                        .eq("id", v.id);
+                      if (error) toast.error(`Eroare update vehicul: ${error.message}`);
+                      else toast.success(`Date completate din ${label}: ${Object.keys(patch).join(", ")}`);
+                    }
+                  }
+                  load();
+                }}
               />
             );
           })}

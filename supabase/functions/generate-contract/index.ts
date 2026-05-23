@@ -92,6 +92,7 @@ async function buildPdf(c: ContractInput): Promise<Uint8Array> {
     `Serie CIV: ${v.serie_civ ?? "—"}`,
     `Capacitate cilindrica: ${v.capacitate_cilindrica ?? "—"} cmc`,
     `Culoare: ${v.culoare ?? "—"}`,
+    `ITP valabil pana la: ${formatRoDate(v.itp_expira_la)}`,
   ].forEach((l) => draw(l));
   y -= 8;
 
@@ -116,6 +117,15 @@ async function buildPdf(c: ContractInput): Promise<Uint8Array> {
   draw("_____________________                              _____________________");
 
   return await doc.save();
+}
+
+/** Formatează o dată ISO `YYYY-MM-DD` (sau undefined/null) ca `DD.MM.YYYY` românesc. */
+function formatRoDate(value: unknown): string {
+  if (typeof value !== "string") return "—";
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return value || "—";
+  const [, y, mo, d] = m;
+  return `${d}.${mo}.${y}`;
 }
 
 function wrap(text: string, max: number): string[] {

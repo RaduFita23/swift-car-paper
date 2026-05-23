@@ -5,7 +5,6 @@ import { useAuth } from "@/modules/auth/AuthProvider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Car, FileText, Plus, User } from "lucide-react";
-import DemoAlertaWhatsApp from "@/components/DemoAlertaWhatsApp";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -62,14 +61,10 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="mt-8 flex gap-3 flex-wrap">
+      <div className="mt-8 flex gap-3">
         <Button asChild><Link to="/vehicles/new"><Plus className="size-4 mr-2" /> Adaugă mașină</Link></Button>
         <Button variant="outline" asChild><Link to="/transactions/new"><Plus className="size-4 mr-2" /> Inițiază tranzacție</Link></Button>
         <Button variant="outline" asChild><Link to="/profile"><User className="size-4 mr-2" /> Profil</Link></Button>
-      </div>
-
-      <div className="mt-8">
-        <DemoAlertaWhatsApp />
       </div>
     </div>
   );

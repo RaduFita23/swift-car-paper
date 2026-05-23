@@ -4,7 +4,7 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-type DocType = "buletin" | "civ" | "talon" | "rca" | "cerere_inmatriculare" | "plata_certificat" | "contract_vc";
+type DocType = "buletin" | "civ" | "talon" | "rca" | "cerere_inmatriculare" | "plata_certificat" | "contract_vc" | "itp";
 
 const SCHEMAS: Record<DocType, { name: string; description: string; parameters: any }> = {
   buletin: {
@@ -94,6 +94,22 @@ const SCHEMAS: Record<DocType, { name: string; description: string; parameters: 
     name: "extract_generic",
     description: "Rezumă documentul",
     parameters: { type: "object", properties: { rezumat: { type: "string" } }, additionalProperties: false },
+  },
+  itp: {
+    name: "extract_itp",
+    description: "Extrage datele din certificatul ITP (Inspecția Tehnică Periodică)",
+    parameters: {
+      type: "object",
+      properties: {
+        nr_inmatriculare: { type: "string" },
+        vin: { type: "string" },
+        data_inspectiei: { type: "string", description: "YYYY-MM-DD" },
+        data_expirare: { type: "string", description: "Data expirării ITP în format YYYY-MM-DD" },
+        statie_itp: { type: "string" },
+      },
+      required: ["data_expirare"],
+      additionalProperties: false,
+    },
   },
 };
 

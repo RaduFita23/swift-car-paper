@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, Plus } from "lucide-react";
+import { Car, Plus, AlertTriangle } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 export default function Vehicles() {
@@ -35,16 +35,30 @@ export default function Vehicles() {
         </Card>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-          {vehicles.map((v) => (
-            <Link key={v.id} to={`/vehicles/${v.id}`}>
-              <Card className="p-5 hover:shadow-md transition-shadow">
-                <Car className="size-5 text-primary" />
-                <div className="mt-3 font-semibold">{v.marca} {v.model}</div>
-                <div className="text-sm text-muted-foreground">{v.an ?? "—"} • {v.nr_inmatriculare ?? "fără număr"}</div>
-                <div className="text-xs text-muted-foreground mt-1 truncate">VIN: {v.vin ?? "—"}</div>
-              </Card>
-            </Link>
-          ))}
+          {vehicles.map((v) => {
+            const itp = v.itp_expira_la ? new Date(v.itp_expira_la) : null;
+            const days = itp ? Math.floor((itp.getTime() - Date.now()) / 86400000) : null;
+            const expired = days !== null && days < 0;
+            const soon = days !== null && days >= 0 && days <= 30;
+            return (
+              <Link key={v.id} to={`/vehicles/${v.id}`}>
+                <Card className="p-5 hover:shadow-md transition-shadow">
+                  <Car className="size-5 text-primary" />
+                  <div className="mt-3 font-semibold">{v.marca} {v.model}</div>
+                  <div className="text-sm text-muted-foreground">{v.an ?? "—"} • {v.nr_inmatriculare ?? "fără număr"}</div>
+                  <div className="text-xs text-muted-foreground mt-1 truncate">VIN: {v.vin ?? "—"}</div>
+                  {itp && (
+                    <div className={`mt-2 text-xs flex items-center gap-1 ${expired ? "text-destructive" : soon ? "text-orange-600" : "text-muted-foreground"}`}>
+                      {(expired || soon) && <AlertTriangle className="size-3" />}
+                      ITP: {itp.toLocaleDateString("ro-RO")}
+                      {expired && " (expirat)"}
+                      {soon && ` (în ${days} zile)`}
+                    </div>
+                  )}
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

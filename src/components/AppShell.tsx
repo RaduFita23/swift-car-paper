@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Car, FileText, LayoutDashboard, LogOut, Shield } from "lucide-react";
@@ -9,12 +9,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const loc = useLocation();
   const nav = useNavigate();
 
-  const items = [
-    { to: "/dashboard", label: "Panou", icon: LayoutDashboard },
-    { to: "/vehicles", label: "Mașini", icon: Car },
-    { to: "/transactions", label: "Tranzacții", icon: FileText },
-    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: Shield }] : []),
-  ];
+  const items = isAdmin
+    ? [{ to: "/admin", label: "Admin", icon: Shield }]
+    : [
+        { to: "/dashboard", label: "Panou", icon: LayoutDashboard },
+        { to: "/vehicles", label: "Mașini", icon: Car },
+        { to: "/transactions", label: "Tranzacții", icon: FileText },
+      ];
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -57,9 +58,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+export function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
+  const { user, isAdmin, loading } = useAuth();
+  const loc = useLocation();
   if (loading) return <div className="min-h-screen grid place-items-center text-muted-foreground">Se încarcă…</div>;
   if (!user) { window.location.href = "/auth"; return null; }
+  if (adminOnly && !isAdmin) return <Navigate to="/dashboard" replace />;
+  if (isAdmin && !loc.pathname.startsWith("/admin")) return <Navigate to="/admin" replace />;
   return <AppShell>{children}</AppShell>;
 }

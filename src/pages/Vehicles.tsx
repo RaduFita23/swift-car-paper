@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/modules/auth/AuthProvider";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Car, Plus } from "lucide-react";
+import { Car, Plus, AlertTriangle } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 export default function Vehicles() {

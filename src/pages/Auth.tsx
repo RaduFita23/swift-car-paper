@@ -16,6 +16,10 @@ import { z } from "zod";
 const signupSchema = z.object({
   email: z.string().email("Email invalid"),
   password: z.string().min(8, "Minim 8 caractere"),
+  passwordConfirm: z.string(),
+  telefon: z.string().trim().regex(/^[0-9+\s().-]{7,20}$/, "Număr de telefon invalid"),
+}).refine((d) => d.password === d.passwordConfirm, {
+  message: "Parolele nu coincid", path: ["passwordConfirm"],
 });
 
 export default function Auth() {
@@ -73,6 +77,7 @@ function SignupForm() {
   const nav = useNavigate();
   const [personType, setPersonType] = useState<"fizica" | "juridica">("fizica");
   const [email, setEmail] = useState(""); const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState(""); const [telefon, setTelefon] = useState("");
   const [loading, setLoading] = useState(false); const [ocrLoading, setOcrLoading] = useState(false);
   const [extracted, setExtracted] = useState<Record<string, any> | null>(null);
   const [ocrFile, setOcrFile] = useState<File | null>(null);
@@ -93,18 +98,23 @@ function SignupForm() {
   return (
     <form className="space-y-4 mt-6" onSubmit={async (e) => {
       e.preventDefault();
-      const parsed = signupSchema.safeParse({ email, password });
+      const parsed = signupSchema.safeParse({ email, password, passwordConfirm, telefon });
       if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
       setLoading(true);
       const redirectUrl = `${window.location.origin}/dashboard`;
+      const ocrWithPhone = { ...(extracted ?? {}), telefon };
       const { data, error } = await supabase.auth.signUp({
         email, password,
         options: {
           emailRedirectTo: redirectUrl,
-          data: { person_type: personType, ocr: extracted ?? undefined },
+          data: { person_type: personType, ocr: ocrWithPhone },
         },
       });
       if (error) { setLoading(false); toast.error(error.message); return; }
+      // asigură telefonul în profil chiar dacă trigger-ul a rulat înainte
+      if (data.user && data.session) {
+        await supabase.from("profiles").update({ telefon }).eq("id", data.user.id);
+      }
       // încarcă fișierul buletinului în storage (dacă există sesiune activă)
       if (data.user && data.session && ocrFile && extracted) {
         const path = `${data.user.id}/buletin-${Date.now()}-${ocrFile.name}`;
@@ -147,7 +157,9 @@ function SignupForm() {
       )}
 
       <div className="space-y-2"><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+      <div className="space-y-2"><Label>Telefon</Label><Input type="tel" required placeholder="07xx xxx xxx" value={telefon} onChange={(e) => setTelefon(e.target.value)} /></div>
       <div className="space-y-2"><Label>Parolă</Label><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+      <div className="space-y-2"><Label>Confirmă parola</Label><Input type="password" required minLength={8} value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} /></div>
       <Button type="submit" className="w-full" disabled={loading}>{loading && <Loader2 className="size-4 mr-2 animate-spin" />}Creează cont</Button>
     </form>
   );

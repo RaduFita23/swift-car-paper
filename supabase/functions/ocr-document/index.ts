@@ -95,6 +95,22 @@ const SCHEMAS: Record<DocType, { name: string; description: string; parameters: 
     description: "Rezumă documentul",
     parameters: { type: "object", properties: { rezumat: { type: "string" } }, additionalProperties: false },
   },
+  itp: {
+    name: "extract_itp",
+    description: "Extrage datele din certificatul ITP (Inspecția Tehnică Periodică)",
+    parameters: {
+      type: "object",
+      properties: {
+        nr_inmatriculare: { type: "string" },
+        vin: { type: "string" },
+        data_inspectiei: { type: "string", description: "YYYY-MM-DD" },
+        data_expirare: { type: "string", description: "Data expirării ITP în format YYYY-MM-DD" },
+        statie_itp: { type: "string" },
+      },
+      required: ["data_expirare"],
+      additionalProperties: false,
+    },
+  },
 };
 
 Deno.serve(async (req) => {

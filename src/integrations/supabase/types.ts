@@ -232,6 +232,7 @@ export type Database = {
           created_at: string
           culoare: string | null
           id: string
+          itp_expira_la: string | null
           km: number | null
           marca: string
           model: string
@@ -246,6 +247,7 @@ export type Database = {
           created_at?: string
           culoare?: string | null
           id?: string
+          itp_expira_la?: string | null
           km?: number | null
           marca: string
           model: string
@@ -260,6 +262,7 @@ export type Database = {
           created_at?: string
           culoare?: string | null
           id?: string
+          itp_expira_la?: string | null
           km?: number | null
           marca?: string
           model?: string
@@ -293,6 +296,7 @@ export type Database = {
         | "plata_certificat"
         | "civ"
         | "talon"
+        | "itp"
       person_type: "fizica" | "juridica"
       transaction_status: "draft" | "docs_pending" | "ready" | "signed"
       transaction_type: "pf_pf" | "pf_pj" | "pj_pf" | "pj_pj"
@@ -432,6 +436,7 @@ export const Constants = {
         "plata_certificat",
         "civ",
         "talon",
+        "itp",
       ],
       person_type: ["fizica", "juridica"],
       transaction_status: ["draft", "docs_pending", "ready", "signed"],

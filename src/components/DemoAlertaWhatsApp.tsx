@@ -6,7 +6,7 @@ import { MessageCircle, Loader2 } from "lucide-react";
 
 // Modulară: schimbă URL-ul webhook-ului n8n aici (sau prin prop `webhookUrl`).
 // Pentru a o elimina, șterge importul și utilizarea componentei + acest fișier.
-const DEFAULT_WEBHOOK_URL = "https://mihai70.app.n8n.cloud/webhook-test/trimite-alerta";
+const DEFAULT_WEBHOOK_URL = "https://finalize-alphabet-twister.ngrok-free.dev/webhook-test/trimite-alerta";
 
 export interface WebhookPayload {
   phone_number: string;
